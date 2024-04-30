@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.13.4)
 project(Toy LANGUAGES CXX C)
 
+set(CMAKE_VERBOSE_MAKEFILE ON) #vnn
+
 set(CMAKE_BUILD_WITH_INSTALL_NAME_DIR ON)
 
 set(CMAKE_CXX_STANDARD 14 CACHE STRING "C++ standard to conform to")
@@ -25,9 +27,27 @@ include(HandleLLVMOptions)
 include_directories(${LLVM_INCLUDE_DIRS})
 include_directories(${MLIR_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/include/toy) #vnn
 include_directories(${PROJECT_BINARY_DIR}/include)
 link_directories(${LLVM_BUILD_LIBRARY_DIR})
 add_definitions(${LLVM_DEFINITIONS})
+
+
+#can't build with the latest clang
+#set(CMAKE_CXX_COMPILER "/Users/vietngo/mlir-dev/llvm-build/bin/clang") #vnn
+#this works
+#Using C++ compiler: /Library/Developer/CommandLineTools/usr/bin/c++
+
+#same linking problem
+#set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin/clang") #vnn
+
+message("Using C++ compiler: ${CMAKE_CXX_COMPILER}")
+# Custom target to display linker command vnn
+add_custom_target(print_linker_command
+    COMMAND ${CMAKE_LINKER} <linker flags> -o <output file> <list of object files>
+    COMMENT "Linker command: ${CMAKE_LINKER} <linker flags> -o <output file> <list of object files>"
+)
+
 
 
 add_subdirectory(include)
@@ -42,6 +62,9 @@ set(LLVM_LINK_COMPONENTS
 set(LLVM_TARGET_DEFINITIONS mlir/ToyCombine.td)
 mlir_tablegen(ToyCombine.inc -gen-rewriters)
 add_public_tablegen_target(ToyCombineIncGen)
+
+# Add -g flag for debugging
+add_compile_options("-g")
 
 add_llvm_executable(toyc
   toyc.cpp

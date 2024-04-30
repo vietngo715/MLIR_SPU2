@@ -4,6 +4,13 @@ Make it convenient to learn llvm and mlir.
 
 ## Build llvm & mlir
 
+vnn
+cmake  -G Ninja -DLLVM_ENABLE_PROJECTS="llvm;mlir" -DCMAKE_BUILD_TYPE=Release ../llvm
+
+ 1066  cmake  -G Ninja -DLLVM_ENABLE_PROJECTS="llvm;mlir" -DCMAKE_BUILD_TYPE=Release ../llvm
+ 1067  cmake --build . -j 8
+
+vnn
 This is an example work-flow and configuration to get and build the LLVM source:
 
 * ``cmake -S llvm -B build -G <generator> -DLLVM_ENABLE_PROJECTS='llvm;mlir' [options]``

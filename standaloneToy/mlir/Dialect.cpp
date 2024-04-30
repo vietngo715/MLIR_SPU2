@@ -466,6 +466,46 @@ static mlir::LogicalResult verify(MatmulOp op) {
   return mlir::success();
 }
 
+// WVProd
+//===----------------------------------------------------------------------===//
+// MatmulOp
+
+void WVProdOp::build(mlir::OpBuilder &builder, mlir::OperationState &state,
+                     mlir::Value lhs, mlir::Value rhs) {
+  state.addTypes(UnrankedTensorType::get(builder.getF64Type()));
+  state.addOperands(lhs);
+  state.addOperands(rhs);
+}
+
+void WVProdOp::inferShapes() {
+  auto lhsTy = getOperands()[0].getType().cast<RankedTensorType>();
+  auto rhsTy = getOperands()[1].getType().cast<RankedTensorType>();
+  SmallVector<int64_t, 2> dims{lhsTy.getShape()[0], rhsTy.getShape()[1]};
+  getResult().setType(RankedTensorType::get(dims, lhsTy.getElementType()));
+}
+
+static mlir::LogicalResult verify(WVProdOp op) {
+  auto lhsType = op.getOperands()[0].getType().dyn_cast<RankedTensorType>();
+  auto rhsType = op.getOperands()[1].getType().dyn_cast<RankedTensorType>();
+  auto resultType = op.getType().dyn_cast<RankedTensorType>();
+  if (!lhsType || !rhsType || !resultType)
+    return mlir::success();
+
+  auto lhsShape = lhsType.getShape();
+  auto rhsShape = rhsType.getShape();
+  auto lhsRank = lhsType.getRank();
+  auto rhsRank = rhsType.getRank();
+
+  if (lhsRank != 2 || rhsRank != 2) {
+    return op.emitError() << "operands of wvprod should be 2 dimension "
+                             "tensor";
+  }
+  if (lhsShape[1] != rhsShape[0]) {
+    return op.emitError() << "unmatch shape of operands of wvprod";
+  }
+  return mlir::success();
+}
+
 //===----------------------------------------------------------------------===//
 // Toy Types
 //===----------------------------------------------------------------------===//
