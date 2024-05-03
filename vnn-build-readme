@@ -3,7 +3,7 @@
 mkdir mlir-toy
 cd mlir-toy
 git clone https://github.com/vietngo715/MLIR_SPU2.git
-cd MLR_SPU2
+cd MLIR_SPU2
 export TOY_ROOT=`pwd`
 mkdir build;cd build
 #Build llvm and mlir using Ninja.
@@ -14,7 +14,7 @@ cmake --build . -j 8
 #
 #Build llvm and mlir without Ninja --> slow
 #cmake  -DLLVM_ENABLE_PROJECTS="llvm;mlir" -DCMAKE_BUILD_TYPE=Release ../llvm
-#cmake --build . -j 8
+#cmake --build . 
 
 ## Build standaloneToy
 cd $TOY_ROOT/standaloneToy
